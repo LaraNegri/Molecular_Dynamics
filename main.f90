@@ -47,7 +47,8 @@ program main
     end if
 !.Abro archivo para escribir trayectorias y energia
 open(unit=33,file='traj.xyz',status='unknown')
-open(unit=34,file='energy.dat',status='unknown')
+open(unit=34,file='potencial.dat',status='unknown')
+open(unit=35, file='cinetica.dat',status='unknown')
 !.Calculo el dt
 dt = t_sim/real(N)
 ! alloco las variables con los datos de entrada
@@ -73,11 +74,14 @@ do i=1,Nsteps
                 v(1,j) = v(1,j) + 0.5*dt*f(1,j)/m
                 v(2,j) = v(2,j) + 0.5*dt*f(2,j)/m
                 v(3,j) = v(3,j) + 0.5*dt*f(3,j)/m
-        end do         
+        end do
+        call Ec_calc()        
         if (mod(i,100)==0) then
                 write(33,*) N !.Escribo header del paso del.xyz
                 write(33,*)
-                write(34,*) i,Vtotal !.Escribo el potencial el energy.dat
+                write(34,*) i,Vtotal !.Escribo el potencial LJ en potencial.dat
+                write(35,*) i, Ec !. Escribo la energía cinética en cinetica.dat
+                
         end if
         
         do j=1,N
@@ -93,6 +97,7 @@ print *, "  * Ciclo MD finalizado "
 !.Cierro archivos
 close(33)
 close(34)
+close(35)
 !! 
 !! FIN FIN edicion
 !! 
