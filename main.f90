@@ -49,6 +49,7 @@ program main
 open(unit=33,file='traj.xyz',status='unknown')
 open(unit=34,file='potencial.dat',status='unknown')
 open(unit=35, file='cinetica.dat',status='unknown')
+open(unit=36, file='energy.dat',status='unknown')
 !.Calculo el dt
 dt = t_sim/real(N)
 ! alloco las variables con los datos de entrada
@@ -81,7 +82,7 @@ do i=1,Nsteps
                 write(33,*)
                 write(34,*) i,Vtotal !.Escribo el potencial LJ en potencial.dat
                 write(35,*) i, Ec !. Escribo la energía cinética en cinetica.dat
-                
+                write(36,*) i,Vtotal+Ec !.Escribo la energia total
         end if
         
         do j=1,N
@@ -98,6 +99,7 @@ print *, "  * Ciclo MD finalizado "
 close(33)
 close(34)
 close(35)
+close(36)
 !! 
 !! FIN FIN edicion
 !! 

@@ -8,6 +8,9 @@ subroutine force()
         !.Inicializo en 0 el potencial y la fuerza total sobre cada particula 
         Vtotal=0
         f = 0
+        !-Hago el desplazamiento del potencial para evitar discontinuidades.
+        V_rc =  4*epsilonn*(-(sigma/rc)**6+(sigma/rc)**12)
+       !.Loop sobre todos los pares de particulas
         do i=1,N
             do j=i+1,N
                 delta_r(1)=(r(1,i)-r(1,j))
@@ -19,8 +22,7 @@ subroutine force()
                 delta_r(3)=delta_r(3)-L*int(2*delta_r(3)/L)
  
                 distance = sqrt(delta_r(1)**2+delta_r(2)**2+delta_r(3)**2)
-                !-Hago el desplazamiento del potencial para evitar discontinuidades.
-                V_rc =  4*epsilonn*(-(sigma/rc)**6+(sigma/rc)**12)
+
 
                 if (distance<=rc) then
                         Vtotal= Vtotal + 4*epsilonn*(-(sigma/distance)**6+(sigma/distance)**12)-V_rc
