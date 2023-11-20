@@ -2,7 +2,7 @@ program main
     use ziggurat
     use globals
     implicit none
-    logical :: es1,es2
+    logical :: es1,es2,es3
     integer :: seed,i,j
     real(kind=8) :: dt
 
@@ -57,25 +57,37 @@ allocate(r(3,N))
 allocate(v(3,N))
 allocate(f(3,N))
 
-!. Inicializo aleatoriamente posiciones
-call init()
-print *, "  *  Potencial total del sist.", Vtotal
-print *, "  * Inicializando sistema con posiciones aleatorias"
+!.Sistema inicial. Veo si hay un archivo como punto de partida
+        inquire(file='positions.dat',exist=es3)
+        if(es3) then
+        open(unit=60,file='positions.dat',status='old')
+        do i=1,N
+                read(60,*) (r(j,i), j=1,3)
+        end do
+        close(60)
+        print *,"  * Leyendo configuracion de archivo positions.dat"
+    else
+        !. Inicializo aleatoriamente posiciones
+        call init()
+        print *, "  * Inicializando sistema con posiciones aleatorias"
+    end if
+
+
+!.Computo las fuerzas y el potencial total de la config inicial
+call force()
+print *, "  * Potencial total del sist.", Vtotal
+
 !.Minimizo la energia en el loop de MD
 do i=1,Nsteps 
         !. Calculo posición y velocidades con Velocity Verlet
-        call integrate()
-        !. Calculo potencial y fuerzas
+        call verlet_positions()
+        !. Calculo potencial y fuerzas con las nuevas posiciones
         call force()
-
         !. Calculo fuerza de Langevin
         call lgv_force()
         !. Vuelvo a calcular velocidades
-        do j = 1,N
-                v(1,j) = v(1,j) + 0.5*dt*f(1,j)/m
-                v(2,j) = v(2,j) + 0.5*dt*f(2,j)/m
-                v(3,j) = v(3,j) + 0.5*dt*f(3,j)/m
-        end do
+        call verlet_velocities()
+        !.Computo energía cinética media
         call Ec_calc()        
         if (mod(i,100)==0) then
                 write(33,*) N !.Escribo header del paso del.xyz
@@ -111,7 +123,7 @@ close(36)
          write(10,*) seed
         close(10)
 ![FIN no Tocar]        
-        open(unit=20,file='posicions.dat',status='unknown')
+        open(unit=20,file='positions.dat',status='unknown')
         ! Escribe la matriz r en el archivo
         do i = 1, N 
                 write(20, *) (r(j, i), j = 1, 3)
