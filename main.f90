@@ -2,7 +2,7 @@ program main
     use ziggurat
     use globals
     implicit none
-    logical :: es1,es2
+    logical :: es1,es2,es3
     integer :: seed,i,j
     real(kind=8) :: dt
 
@@ -37,18 +37,24 @@ program main
         print *,"  * Leyendo datos de input.dat"
     else
         N = 10
-        L = 1.0
+        L = 6.0
         Nsteps = 1000
         sigma = 1.0
         epsilonn = 1.0
         m =1.0
-        t_sim = 1e-15
+        t_sim = 0.001
         print *, "  * Sin input.dat, colocando valores por defecto"
     end if
 !.Abro archivo para escribir trayectorias y energia
 open(unit=33,file='traj.xyz',status='unknown')
 open(unit=34,file='potencial.dat',status='unknown')
 open(unit=35, file='cinetica.dat',status='unknown')
+open(unit=36, file='energy.dat',status='unknown')
+
+!Defino radio de corte
+rc = 2.5*sigma
+!.Calculo el potencial en rc para evitar discontinuidades
+V_rc = 4*epsilonn*(-(sigma/rc)**6+(sigma/rc)**12)
 !.Calculo el dt
 dt = t_sim/real(N)
 ! alloco las variables con los datos de entrada
@@ -56,48 +62,57 @@ allocate(r(3,N))
 allocate(v(3,N))
 allocate(f(3,N))
 
-!. Inicializo aleatoriamente posiciones
-call init()
-print *, "  *  Potencial total del sist.", Vtotal
-print *, "  * Inicializando sistema con posiciones aleatorias"
+!.Sistema inicial. Veo si hay un archivo como punto de partida
+        inquire(file='positions.dat',exist=es3)
+        if(es3) then
+        open(unit=60,file='positions.dat',status='old')
+        do i=1,N
+                read(60,*) (r(j,i), j=1,3)
+        end do
+        close(60)
+        print *,"  * Leyendo configuracion de archivo positions.dat"
+    else
+        !. Inicializo aleatoriamente posiciones
+        call init()
+        print *, "  * Inicializando sistema con posiciones aleatorias"
+    end if
+
+
+!.Computo las fuerzas y el potencial total de la config inicial
+call force()
+print *, "  * Potencial total del sist.", Vtotal
+
 !.Minimizo la energia en el loop de MD
 do i=1,Nsteps 
         !. Calculo posición y velocidades con Velocity Verlet
-        call integrate()
-        !. Calculo potencial y fuerzas
+        call verlet_positions()
+        !. Calculo potencial y fuerzas con las nuevas posiciones
         call force()
-
         !. Calculo fuerza de Langevin
-        call lgv_force()
+        !call lgv_force()
         !. Vuelvo a calcular velocidades
-        do j = 1,N
-                v(1,j) = v(1,j) + 0.5*dt*f(1,j)/m
-                v(2,j) = v(2,j) + 0.5*dt*f(2,j)/m
-                v(3,j) = v(3,j) + 0.5*dt*f(3,j)/m
-        end do
-        call Ec_calc()        
+        call verlet_velocities()
+        !.Computo energía cinética media
+        call Ec_calc()  
         if (mod(i,100)==0) then
                 write(33,*) N !.Escribo header del paso del.xyz
                 write(33,*)
                 write(34,*) i,Vtotal !.Escribo el potencial LJ en potencial.dat
                 write(35,*) i, Ec !. Escribo la energía cinética en cinetica.dat
-                
+                write(36,*) i,Vtotal+Ec !.Escribo la energia total
+        
+                do j=1,N  !.Escribo posiciones .xyz
+                        write(33,*) "N",r(1,j),r(2,j),r(3,j)
+                end do
         end if
         
-        do j=1,N
-                r(1,j)=r(1,j)+0.5*f(1,j)/m*dt**2
-                r(2,j)=r(2,j)+0.5*f(2,j)/m*dt**2
-                r(3,j)=r(3,j)+0.5*f(3,j)/m*dt**2
-                if (mod(i,100)==0) then
-                        write(33,*) "N",r(1,j),r(2,j),r(3,j)
-                end if
-        end do
 end do
 print *, "  * Ciclo MD finalizado "
 !.Cierro archivos
 close(33)
 close(34)
 close(35)
+close(36)
 !! 
 !! FIN FIN edicion
 !! 
@@ -109,7 +124,7 @@ close(35)
          write(10,*) seed
         close(10)
 ![FIN no Tocar]        
-        open(unit=20,file='posicions.dat',status='unknown')
+        open(unit=20,file='positions.dat',status='unknown')
         ! Escribe la matriz r en el archivo
         do i = 1, N 
                 write(20, *) (r(j, i), j = 1, 3)
@@ -121,6 +136,14 @@ close(35)
         do i = 1, N
                 write(30, *) (f(j, i), j = 1, 3)
         end do
-        close(30) 
+        close(30)
+
+
+        open(unit=40,file='velocidades.dat',status='unknown')
+        ! Escribe la matriz f en el archivo
+        do i = 1, N
+                write(40, *) (v(j, i), j = 1, 3)
+        end do
+        close(40) 
  print *, "  * Archivos de energia y posiciones escrito"
 end program main

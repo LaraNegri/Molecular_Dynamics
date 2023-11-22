@@ -1,14 +1,12 @@
 subroutine force()
         use globals
-        !.Computo el potencial y lo guardo en una variable
-        !. Computo las fuerzas y la guardo en f(3,N)
         integer :: i,j
-        real(kind=8) :: distance,fuerza,delta_r(3),rc
-        rc=2.5*sigma
+        real(kind=8) :: distance,fuerza,delta_r(3)
         !.Inicializo en 0 el potencial y la fuerza total sobre cada particula 
         Vtotal=0
         f = 0
-        do i=1,N
+       !.Loop sobre todos los pares de particulas
+        do i=1,N-1
             do j=i+1,N
                 delta_r(1)=(r(1,i)-r(1,j))
                 delta_r(2)=(r(2,i)-r(2,j))
@@ -19,8 +17,7 @@ subroutine force()
                 delta_r(3)=delta_r(3)-L*int(2*delta_r(3)/L)
  
                 distance = sqrt(delta_r(1)**2+delta_r(2)**2+delta_r(3)**2)
-                !-Hago el desplazamiento del potencial para evitar discontinuidades.
-                V_rc =  4*epsilonn*(-(sigma/rc)**6+(sigma/rc)**12)
+
 
                 if (distance<=rc) then
                         Vtotal= Vtotal + 4*epsilonn*(-(sigma/distance)**6+(sigma/distance)**12)-V_rc
