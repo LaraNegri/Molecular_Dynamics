@@ -12,6 +12,7 @@ subroutine init ()
                 r(1,i) = x
                 r(2,i) = y
                 r(3,i) = z
+
          end do
 
 end subroutine init

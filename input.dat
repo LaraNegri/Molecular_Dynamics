@@ -1,5 +1,5 @@
-80    # Numero de partículas
-10  # Largo de la caja de simulación
+100    # Numero de partículas
+10.0  # Largo de la caja de simulación
 100000 # MD steps
 1.0 1.0 # Sigma y Epsilon de LJ
 1.0  # Masa de las particulas
