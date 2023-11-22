@@ -13,6 +13,10 @@ subroutine init ()
                 r(2,i) = y
                 r(3,i) = z
 
+                !. Inicializo velocidades en el vector v(:,N)
+                v(1,i) = (T**0.5)*rnor()
+                v(2,i) = (T**0.5)*rnor()
+                v(3,i) = (T**0.5)*rnor()
          end do
-
+        
 end subroutine init

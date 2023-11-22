@@ -3,5 +3,5 @@
 100000 # MD steps
 1.0 1.0 # Sigma y Epsilon de LJ
 1.0  # Masa de las particulas
-1.0 # Tiempo de simulacion
+10000.0 # Tiempo de simulacion
 1.5 # Temperatura de simulacion
