@@ -3,7 +3,8 @@ program main
     use globals
     implicit none
     logical :: es1,es2,es3
-    integer :: seed,i,j
+    integer :: seed,i,j,k
+
 
 ![NO TOCAR] Inicializa generador de número random
 
@@ -24,23 +25,23 @@ program main
     inquire(file='input.dat',exist=es2)
     if(es2) then
         open(unit=18,file='input.dat',status='old')
-        read(18,*) N  ! Cantidad de partículas
+        read(18,*) rho  ! densidad
         read(18,*) L  ! Largo de la caja
         read(18,*) Nsteps ! Cantidad de pasos de MD
         read(18,*) sigma, epsilonn ! Datos del potencial de LJ
         read(18,*) m  !.Masa de las particulas
-        read(18,*) t_sim !.Tiempo de simulacion
+        read(18,*) dt !.Paso de tiempo
         read(18,*) T !.Temperatura de simulacion
         close(18)
         print *,"  * Leyendo datos de input.dat"
     else
-        N = 5
+        rho = 0.3
         L = 6.0
         Nsteps = 1000
         sigma = 1.0
         epsilonn = 1.0
         m =1.0
-        t_sim = 100000.0
+        dt = 0.001
         print *, "  * Sin input.dat, colocando valores por defecto"
     end if
 !.Abro archivo para escribir trayectorias y energia
@@ -49,19 +50,23 @@ open(unit=34,file='potencial.dat',status='unknown')
 open(unit=35, file='cinetica.dat',status='unknown')
 open(unit=36, file='energy.dat',status='unknown')
 
+!.Calculo el numero de particulas
+N = int(rho*L**3)
 !Defino radio de corte
 rc = 2.5*sigma
 !.Calculo el potencial en rc para evitar discontinuidades
 V_rc = 4*epsilonn*(-(sigma/rc)**6+(sigma/rc)**12)
 !.Calculo el dt
-dt = 1
+t_sim = dt*Nsteps
+print *, "  * Número de partículas:", N
+print *, "  * Tiempo a simular:", t_sim
+
 ! alloco las variables con los datos de entrada
 allocate(r(3,N))
 allocate(v(3,N))
 allocate(f(3,N))
-
 !.Sistema inicial. Veo si hay un archivo como punto de partida
-        !inquire(file='positions.dat',exist=es3)
+       !inquire(file='positions.dat',exist=es3)
         !if(es3) then
         !open(unit=60,file='positions.dat',status='old')
         !do i=1,N
@@ -71,21 +76,38 @@ allocate(f(3,N))
         !print *,"  * Leyendo configuracion de archivo positions.dat"
    ! else
         !. Inicializo aleatoriamente posiciones y velocidades0
-        call init()
-        print *, "  * Inicializando sistema con posiciones y velocidades aleatorias"
+ call init()
+ print *, "  * Inicializando sistema con posiciones y velocidades aleatorias..."
     !end if
 
+print *, "  * Escribiendo archivo de posiciones "
+        open(unit=20,file='positions1.dat',status='unknown')
+        ! Escribe la matriz r en el archivo
+        do i = 1, N 
+                write(20, *) (r(j, i), j = 1, 3)
+        end do
+        close(20) 
 
 !.Computo las fuerzas y el potencial total de la config inicial
-!call force()
-!print *, "  * Potencial total del sist.", Vtotal
+call force()
+print *, "  * Potencial total del sist.", Vtotal
 
+print *, "  * Escribiendo archivo de fuerzas "
+        open(unit=30,file='fuerzasi.dat',status='unknown')
+        ! Escribe la matriz f en el archivo
+        do i = 1, N
+                write(30, *) (f(j, i), j = 1, 3)
+        end do
+        close(30)
 !.Minimización de energía
-do i=1,500
+print *, "  * Ciclo de minimización de energía..."
+do k=1,500
         call verlet_positions()
         call force()
+        call verlet_velocities()
 end do
 
+print *, "  * Inicializando ciclo MD..."
 !.Minimizo la energia en el loop de MD !Creo que acá es solo loop MD, minimización de energía va antes
 do i=1,Nsteps
         !. Calculo posición y velocidades con Velocity Verlet
@@ -123,11 +145,14 @@ close(36)
 ![No TOCAR]
 ! Escribir la última semilla para continuar con la cadena de numeros aleatorios 
 
+print *, "  * Escribiendo archivo de semilla "
         open(unit=10,file='seed.dat',status='unknown')
         seed = shr3() 
-         write(10,*) seed
+        write(10,*) seed
         close(10)
 ![FIN no Tocar]        
+
+print *, "  * Escribiendo archivo de posiciones "
         open(unit=20,file='positions.dat',status='unknown')
         ! Escribe la matriz r en el archivo
         do i = 1, N 
@@ -135,7 +160,8 @@ close(36)
         end do
         close(20) 
 
-        open(unit=30,file='fuerzas.dat',status='unknown')
+print *, "  * Escribiendo archivo de fuerzas "
+        open(unit=30,file='fuerzasf.dat',status='unknown')
         ! Escribe la matriz f en el archivo
         do i = 1, N
                 write(30, *) (f(j, i), j = 1, 3)
@@ -143,6 +169,7 @@ close(36)
         close(30)
 
 
+print *, "  * Escribiendo archivo de velocidad "
         open(unit=40,file='velocidades.dat',status='unknown')
         ! Escribe la matriz v en el archivo
         do i = 1, N

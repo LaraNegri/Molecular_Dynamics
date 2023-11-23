@@ -5,9 +5,9 @@ subroutine init ()
         real(kind=8) :: x,y,z    
         do i = 1, N
                 !.Sorteo posiciones (x,y,z) 
-                x = uni()*L
-                y = uni()*L
-                z = uni()*L
+                x = (2*uni()-1)*L/2
+                y = (2*uni()-1)*L/2
+                z = (2*uni()-1)*L/2
                 !. Lo coloco en el vector r(:,N)
                 r(1,i) = x
                 r(2,i) = y

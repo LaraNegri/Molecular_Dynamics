@@ -1,7 +1,7 @@
-100    # Numero de partículas
-10.0  # Largo de la caja de simulación
-100000 # MD steps
-1.0 1.0 # Sigma y Epsilon de LJ
-1.0  # Masa de las particulas
-10000.0 # Tiempo de simulacion
-1.5 # Temperatura de simulacion
+0.3 #.Densidad número
+10.0 #.Largo de la caja de simulación
+100000 #.MD steps
+1.0 1.0 #.sigma y epsilon de LJ
+1.0 #.Masa de las partículas
+0.0000001 #.dt de simulación
+1.5 #.Temperatura de simulación
