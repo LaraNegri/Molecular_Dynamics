@@ -6,7 +6,6 @@ subroutine lgv_force()
         real(kind=8) :: gamma_lgv, sigma_lgv
 
         gamma_lgv = 0.5
-        dt = t_sim/real(N)
         sigma_lgv = sqrt((2*T*gamma_lgv*m)/dt)
 
         do i = 1,N
