@@ -3,11 +3,11 @@ subroutine lgv_force()
         use ziggurat
         !. Computo la fuerza de Langevin
         integer :: i
-        real(kind=8) :: gamma_lgv, sigma_lgv, dt
+        real(kind=8) :: gamma_lgv, sigma_lgv
 
         gamma_lgv = 0.5
         dt = t_sim/real(N)
-        sigma_lgv = -sqrt((2*T*gamma_lgv*m)/dt)
+        sigma_lgv = sqrt((2*T*gamma_lgv*m)/dt)
 
         do i = 1,N
                 f(1,i) = f(1,i) - gamma_lgv*v(1,i) + sigma_lgv*rnor()

@@ -54,6 +54,7 @@ open(unit=36, file='energy.dat',status='unknown')
 N = int(rho*L**3)
 !Defino radio de corte
 rc = 2.5*sigma
+print *,"rc=",rc
 !.Calculo el potencial en rc para evitar discontinuidades
 V_rc = 4*epsilonn*(-(sigma/rc)**6+(sigma/rc)**12)
 !.Calculo el dt
@@ -80,32 +81,16 @@ allocate(f(3,N))
  print *, "  * Inicializando sistema con posiciones y velocidades aleatorias..."
     !end if
 
-print *, "  * Escribiendo archivo de posiciones "
-        open(unit=20,file='positions1.dat',status='unknown')
-        ! Escribe la matriz r en el archivo
-        do i = 1, N 
-                write(20, *) (r(j, i), j = 1, 3)
-        end do
-        close(20) 
-
-!.Computo las fuerzas y el potencial total de la config inicial
 call force()
+!.Computo las fuerzas y el potencial total de la config inicial
 print *, "  * Potencial total del sist.", Vtotal
 
-print *, "  * Escribiendo archivo de fuerzas "
-        open(unit=30,file='fuerzasi.dat',status='unknown')
-        ! Escribe la matriz f en el archivo
-        do i = 1, N
-                write(30, *) (f(j, i), j = 1, 3)
-        end do
-        close(30)
 !.Minimización de energía
 print *, "  * Ciclo de minimización de energía..."
-do k=1,500
-        call verlet_positions()
-        call force()
-        call verlet_velocities()
-end do
+
+do k=1,10000
+        call minimize_energy()
+end do            
 
 print *, "  * Inicializando ciclo MD..."
 !.Minimizo la energia en el loop de MD !Creo que acá es solo loop MD, minimización de energía va antes
@@ -119,8 +104,8 @@ do i=1,Nsteps
         !. Vuelvo a calcular velocidades
         call verlet_velocities()
         !.Computo energía cinética media
-        call Ec_calc()  
         if (mod(i,100)==0) then
+        call Ec_calc()  
                 write(33,*) N !.Escribo header del paso del.xyz
                 write(33,*)
                 write(34,*) i, Vtotal !.Escribo el potencial LJ en potencial.dat
@@ -128,7 +113,7 @@ do i=1,Nsteps
                 write(36,*) i,Vtotal+Ec !.Escribo la energia total
         
                 do j=1,N  !.Escribo posiciones .xyz
-                        write(33,*) "N",r(1,j),r(2,j),r(3,j)
+                        write(33,*) "S",r(1,j),r(2,j),r(3,j)
                 end do
         end if
         
@@ -161,7 +146,7 @@ print *, "  * Escribiendo archivo de posiciones "
         close(20) 
 
 print *, "  * Escribiendo archivo de fuerzas "
-        open(unit=30,file='fuerzasf.dat',status='unknown')
+        open(unit=30,file='fuerzas.dat',status='unknown')
         ! Escribe la matriz f en el archivo
         do i = 1, N
                 write(30, *) (f(j, i), j = 1, 3)

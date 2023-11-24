@@ -12,9 +12,9 @@ subroutine force()
                 delta_r(2)=(r(2,i)-r(2,j))
                 delta_r(3)=(r(3,i)-r(3,j))
                 !.Inserto las PBC considerando L/2
-                delta_r(1)=delta_r(1)-L*((2.0*delta_r(1)/L)-int(2.0*delta_r(1)/L))
-                delta_r(2)=delta_r(2)-L*((2.0*delta_r(2)/L)-int(2.0*delta_r(2)/L))
-                delta_r(3)=delta_r(3)-L*((2.0*delta_r(3)/L)-int(2.0*delta_r(3)/L))
+                delta_r(1)=delta_r(1)-L*int(2.0*delta_r(1)/L)
+                delta_r(2)=delta_r(2)-L*int(2.0*delta_r(2)/L)
+                delta_r(3)=delta_r(3)-L*int(2.0*delta_r(3)/L)
  
                 distance = sqrt(delta_r(1)**2+delta_r(2)**2+delta_r(3)**2)
 
@@ -32,13 +32,8 @@ subroutine force()
                         f(3,i) = f(3,i)+fuerza * delta_r(3)/distance
                         f(3,j)=f(3,j)-fuerza * delta_r(3)/distance
 
-                       ! write(*,*) "Fuerzas en x:", f(1, i), f(1, j)
-                       ! write(*,*) "Fuerzas en y:", f(2, i), f(2, j)
-                       ! write(*,*) "Fuerzas en z:", f(3, i), f(3, j)
-
                 end if
             end do
         end do
-       ! print *, f(:,1)
 end subroutine force
 
