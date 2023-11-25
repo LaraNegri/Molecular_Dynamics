@@ -55,7 +55,7 @@ open(unit=37, file='presion.dat',status='unknown')
 N = int(rho*L**3)
 !Defino radio de corte
 rc = 2.5*sigma
-print *,"rc=",rc
+print *,"  * Usando rc=",rc
 !.Calculo el potencial en rc para evitar discontinuidades
 V_rc = 4*epsilonn*(-(sigma/rc)**6+(sigma/rc)**12)
 !.Calculo el dt
