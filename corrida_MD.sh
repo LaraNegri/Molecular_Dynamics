@@ -13,7 +13,7 @@ do
 	do
     		echo "Modificando input.dat con densidad: $rho"
     		# Utiliza sed para modificar la línea específica
-		sed -i "1s/.*/$rho/" "$input_file"
+		sed -i "1s/.*/$rho/" "./input.dat"
 
     		echo "Ejecutando $ejecutable con densidad: $rho"
     		#.Elimino matriz.dat asi inicializa aleatoriamente
