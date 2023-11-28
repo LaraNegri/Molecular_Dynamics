@@ -50,6 +50,7 @@ open(unit=34,file='potencial.dat',status='unknown')
 open(unit=35, file='cinetica.dat',status='unknown')
 open(unit=36, file='energy.dat',status='unknown')
 open(unit=37, file='presion.dat',status='unknown')
+open(unit=38, file='temperatura.dat', status='unknown')
 
 !.Calculo el numero de particulas
 N = int(rho*L**3)
@@ -108,13 +109,16 @@ do i=1,Nsteps
         if (mod(i,100)==0) then
         call Ec_calc()
         !. Calculo presión del sistema
-        call p_calc()  
+        call p_calc()
+        !. Calculo la temperatura (para ver si funciona Langevin)
+        call T_calc()  
                 write(33,*) N !.Escribo header del paso del.xyz
                 write(33,*)
                 write(34,*) i, Vtotal !.Escribo el potencial LJ en potencial.dat
                 write(35,*) i, Ec !. Escribo la energía cinética en cinetica.dat
                 write(36,*) i,Vtotal+Ec !.Escribo la energia total
                 write(37,*) i, p !.Escribo la presión del sistema
+                write(38,*) i, Test !.Escribo la temperatura del sistema
 
                 do j=1,N  !.Escribo posiciones .xyz
                         write(33,*) "S",r(1,j),r(2,j),r(3,j)
@@ -123,12 +127,16 @@ do i=1,Nsteps
         
 end do
 print *, "  * Ciclo MD finalizado "
+
+call var()
+
 !.Cierro archivos
 close(33)
 close(34)
 close(35)
 close(36)
 close(37)
+close(38)
 !! 
 !! FIN FIN edicion
 !! 
