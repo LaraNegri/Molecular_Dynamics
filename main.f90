@@ -180,4 +180,5 @@ print *, "  * Escribiendo archivo de velocidad "
         end do
         close(40) 
  print *, "  * Archivos de energia y posiciones escrito"
+ print *, " "
 end program main

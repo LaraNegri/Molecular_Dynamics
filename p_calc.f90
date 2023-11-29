@@ -3,6 +3,9 @@ subroutine p_calc()
         integer :: i,j
         real(kind=8) :: delta_r(3)
         p = 0 !. Inicializo el contador de presión en cero
+        !.CAlculo temperatura
+        call Ec_calc()
+        T_calc = 2*Ec/(3*N)
         !. Loop sobre todas las partículas
         do i=1,N-1
                 do j=i+1,N    
@@ -16,10 +19,11 @@ subroutine p_calc()
                 delta_r(3)=delta_r(3)-L*int(2.0*delta_r(3)/L)
                 !rF = delta_r(1)*(f(1,i)+f(1,j))+delta_r(2)*(f(2,i)+f(2,j))+delta_r(3)*(f(3,i)+f(3,j))
                 rF = delta_r(1)*(f(1,i))+delta_r(2)*(f(2,i))+delta_r(3)*(f(3,i))
-                p =p + rho*T + (0.5/(L**3))*rf
+                p =p + (1.0/(3.0*L**3))*rF
 
         end do
         end do
+        p = p/100+rho*T_calc
                 !. Asumí dU/dV = 0 por estar a V=cte
 
 end subroutine p_calc
