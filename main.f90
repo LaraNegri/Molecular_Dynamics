@@ -130,6 +130,11 @@ print *, "  * Ciclo MD finalizado "
 
 call var()
 
+!. Guardo la varianza
+open(unit=39, file='varianza.dat', status='unknown')
+write(39, *) varianza
+close(39)
+
 !.Cierro archivos
 close(33)
 close(34)

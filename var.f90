@@ -6,5 +6,5 @@ subroutine var()
                 pnor = pnor + p
         end do
 
-        var = (p/Nsteps-(p**2)/Nsteps)**0.5
+        varianza = (p/Nsteps-(p**2)/Nsteps)**0.5
 end subroutine

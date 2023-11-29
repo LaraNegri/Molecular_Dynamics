@@ -5,5 +5,5 @@ real(kind=8) :: L, epsilonn, sigma, Vtotal  ! Largo de la caja de simulación y 
 real(kind=8) :: t_sim,m,rho  !.Tiempo de simulacion y masa de las particulas
 integer :: N, Nsteps  ! Cantidad de particulas y número de pasos de MD
 real(kind=8) :: T, Ec, V_rc, rc, dt, Test !Temperatura, energia cinetica, Potencial y radio de corte
-real(kind=8) :: p, pnor, var !Presion
+real(kind=8) :: p, pnor, varianza !Presion
 end module globals
