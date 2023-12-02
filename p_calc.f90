@@ -5,7 +5,7 @@ subroutine p_calc()
         p = 0 !. Inicializo el contador de presión en cero
         !.CAlculo temperatura
         call Ec_calc()
-        T_calc = 2*Ec/(3*N)
+        T_calc = 2.0*Ec/(3.0*N)
         !. Loop sobre todas las partículas
         do i=1,N-1
                 do j=i+1,N    
@@ -23,7 +23,7 @@ subroutine p_calc()
 
         end do
         end do
-        p = p/100+rho*T_calc
+        p = (p/100.0)+rho*T_calc
                 !. Asumí dU/dV = 0 por estar a V=cte
 
 end subroutine p_calc

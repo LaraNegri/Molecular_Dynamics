@@ -32,7 +32,10 @@ do
      	# Renombra el archivo de presion interna
     		mv ./presion.dat "./resultados/$i-presion_$rho.dat"
 
-     	# Renombra el archivo .xyz para VMD
+     	# Renombra el archivo de varianza de presion interna
+    		mv ./varianza.dat "./resultados/$i-varianza_$rho.dat"
+     	
+	# Renombra el archivo .xyz para VMD
     		mv ./traj.xyz "./resultados/$i-traj_$rho.xyz"
 
 
