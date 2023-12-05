@@ -90,7 +90,7 @@ print *, "  * Potencial total del sist.", Vtotal
 !.Minimización de energía
 print *, "  * Ciclo de minimización de energía..."
 
-do k=1,10000
+do k=1,30000
         call minimize_energy()
 end do            
 
